@@ -1,0 +1,111 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+}
+
+header h3 {
+    margin: 0;
+}
+
+/* Buttons */
+button {
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Primary button */
+button.primary {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Table */
+.table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.table th button {
+    background: none;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Action buttons */
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Status indicators */
+.status-active {
+    color: green;
+    font-weight: bold;
+}
+
+.status-storno {
+    color: red;
+    font-weight: bold;
+}
+.print-button {
+    background-color: #6c757d; /* Gray */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.print-button:hover {
+    background-color: #5a6268; /* Darker gray on hover */
+}
