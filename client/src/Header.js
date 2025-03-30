@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown } from "lucide-react"; // For the dropdown icon
 import "./Header.css";
 
 function Header() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // Assume user info comes from some auth service
 
   // Example of fetching the current user (could be from context, Redux, etc.)
@@ -17,7 +15,7 @@ function Header() {
   const handleLogout = async () => {
     try {
         // Send logout request to Flask backend
-        const response = await fetch("http://localhost:5000/logout", {
+        const response = await fetch("https://e-narocilnice-5.onrender.com/logout", {
             method: "POST",
             credentials: "include", // Ensures cookies are sent
         });
