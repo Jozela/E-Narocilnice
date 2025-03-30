@@ -10,7 +10,7 @@ const OrderTypePage = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/orders?type=${type}`, {
+                const response = await axios.get(`https://e-narocilnice-5.onrender.com/orders?type=${type}`, {
                     withCredentials: true,
                 });
 

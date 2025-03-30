@@ -61,7 +61,7 @@ const OrderPage = () => {
     };
     const DownloadOrderPdf = async (orderId) => {
         try {
-          const response = await fetch(`http://localhost:5000/api/orders-pdf/${orderId}`, {
+          const response = await fetch(`https://e-narocilnice-5.onrender.com/api/orders-pdf/${orderId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

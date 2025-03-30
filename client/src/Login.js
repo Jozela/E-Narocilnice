@@ -16,7 +16,7 @@ const Login = () => {
     
         try {
             // Send POST request to Flask backend for login
-            const response = await fetch('/login', {
+            const response = await fetch('https://e-narocilnice-5.onrender.com/login', {
                 method: 'POST',
                 withCredentials: true,
                 headers: { 'Content-Type': 'application/json' },
