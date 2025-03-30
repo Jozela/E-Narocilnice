@@ -16,7 +16,7 @@ const Login = () => {
     
         try {
             // Send POST request to Flask backend for login
-            const response = await fetch('http://localhost:5000/login', {
+            const response = await fetch('/login', {
                 method: 'POST',
                 withCredentials: true,
                 headers: { 'Content-Type': 'application/json' },
@@ -30,8 +30,10 @@ const Login = () => {
             if (response.ok) {
                 // Successful login
                 console.log("Login successful:", data);
+                //setIsAuthenticated(true);
+                localStorage.setItem('authToken', 'some-token-value');
                 localStorage.setItem('username', username);  // Save username to localStorage
-                window.location.href = 'http://localhost:3000/orders';
+                window.location.href = '/orders';
             } else {
                 // Handle invalid login or server error
                 setError(data.message || 'Invalid login. Please check your credentials.');

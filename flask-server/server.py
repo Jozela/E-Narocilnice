@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, make_response,send_file
+from flask import Flask, request, jsonify, session, make_response,send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 import base64
@@ -17,7 +17,11 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib.units import cm
 import io
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='client/build', static_url_path='')
+
+@app.route('/')
+def index():
+    return send_from_directory(app.static_folder, 'index.html')
 app.secret_key = 'supersecretkey'  # Make sure the secret key is set correctly
 app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_PERMANENT'] = True  # Keep session non-permanent if you're handling authentication via cookies
@@ -31,7 +35,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
     '@cdbag44qc0vu1j.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d7dgl7a350n8u'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-CORS(app, supports_credentials=True, origins="http://localhost:3000", allow_headers=["Content-Type"])
+CORS(app)
+#CORS(app, supports_credentials=True, origins="http://localhost:3000", allow_headers=["Content-Type"])
 
 db = SQLAlchemy(app)
 date_str = '2025-02-19'
@@ -43,6 +48,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+
+    def __init__(self, username, password, is_superuser=False):
+        self.username = username
+        self.password = password
+        self.is_superuser = is_superuser if is_superuser is not None else False
 
 def verify_password_django_pbkdf2(password: str, stored_hash: str) -> bool:
     try:
