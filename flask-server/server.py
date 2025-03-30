@@ -35,8 +35,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
     '@cdbag44qc0vu1j.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d7dgl7a350n8u'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-CORS(app)
-#CORS(app, supports_credentials=True, origins="http://localhost:3000", allow_headers=["Content-Type"])
+
+#CORS(app)
+CORS(app, supports_credentials=True, origins="https://clever-dasik-75eefa.netlify.app")
 
 db = SQLAlchemy(app)
 date_str = '2025-02-19'
@@ -70,7 +71,6 @@ def verify_password_django_pbkdf2(password: str, stored_hash: str) -> bool:
 
 # Login route
 @app.route('/login', methods=['POST'])
-@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def login():
     data = request.get_json()  # Ensure it's a JSON request
     username = data.get('username')
@@ -98,7 +98,6 @@ def login():
 
 # Logout route
 @app.route('/logout', methods=['POST', 'GET'])
-@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def logout():
     session.clear()
     session.pop('username', None)  # Clear username from session
@@ -159,7 +158,6 @@ def update_order(order_id):
 
 # Route to get orders (without Flask-Login)
 @app.route('/orders', methods=['GET'])
-@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def get_orders():
     year = request.args.get('year')  # Get 'year' from query params
     order_type = request.args.get('type')
