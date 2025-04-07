@@ -165,7 +165,7 @@ def get_orders():
     order_type = request.args.get('type')
     print(session.get('username', 'No session data'))
     if 'username' not in session:
-        return jsonify({"message": "Not logged in"}), 401
+        return jsonify({"message": "Not logged in"} + {session['username']}), 401
     current_user_username = session['username']
     #user_orders = Order.query.filter_by(vnasatelj=current_user_username).all()
     #user_orders = Order.query.filter_by(vnasatelj=current_user_username).all() 
@@ -212,6 +212,7 @@ def get_orders():
         for order, dobavitelj in user_orders
     ]
     print(f"Orders list: {orders_list}")
+    
     return jsonify(orders_list)
 
 # Example route to export orders to Word
@@ -491,7 +492,7 @@ def set_session():
 
 @app.route('/get_session')
 def get_session():
-    print(session.get('username'))
+    print(session['username'])
     return session.get('username', 'No session data')
 
 # Model for orders (no changes)
