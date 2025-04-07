@@ -29,6 +29,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = False  # Change to True if using HTTPS
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Prevents some browsers from blocking it
+app.secret_key = 'your-secret-key'  # Make sure this is set!
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     'postgresql://uacllgann1lh52:pb8fd795174bbd64c4dbe1a3b89bf3916540dd739575da57c098074cd7bf86a9e'
