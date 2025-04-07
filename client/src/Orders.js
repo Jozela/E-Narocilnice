@@ -20,7 +20,7 @@ const OrderPage = () => {
         // Fetch orders from the API
         const fetchOrders = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/orders', {
+                const response = await axios.get('https://e-narocilnice-5.onrender.com/orders', {
                     withCredentials: true, 
                 });
 
