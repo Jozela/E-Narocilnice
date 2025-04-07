@@ -38,7 +38,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #CORS(app)
 CORS(app, supports_credentials=True)
-
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",  # Or 'Lax' if not using HTTPS
+    SESSION_COOKIE_SECURE=True       # Required for 'None' to work (only over HTTPS)
+)
 db = SQLAlchemy(app)
 date_str = '2025-02-19'
 date_format = '%Y-%m-%d'  # Adjusted format for just date
