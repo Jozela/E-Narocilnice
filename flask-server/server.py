@@ -22,14 +22,14 @@ app = Flask(__name__, static_folder='client/build', static_url_path='')
 @app.route('/')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
-app.secret_key = 'supersecretkey'  # Make sure the secret key is set correctly
+app.secret_key = 'supersecretkey'  
 app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SESSION_PERMANENT'] = True  # Keep session non-permanent if you're handling authentication via cookies
+app.config['SESSION_PERMANENT'] = True  
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SECURE'] = False  # Change to True if using HTTPS
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Prevents some browsers from blocking it
-app.secret_key = 'your-secret-key'  # Make sure this is set!
+app.config['SESSION_COOKIE_SECURE'] = False  
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  
+app.secret_key = 'your-secret-key' 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     'postgresql://uacllgann1lh52:pb8fd795174bbd64c4dbe1a3b89bf3916540dd739575da57c098074cd7bf86a9e'
@@ -39,12 +39,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #CORS(app)
 CORS(app, supports_credentials=True)
 app.config.update(
-    SESSION_COOKIE_SAMESITE="None",  # Or 'Lax' if not using HTTPS
-    SESSION_COOKIE_SECURE=True       # Required for 'None' to work (only over HTTPS)
+    SESSION_COOKIE_SAMESITE="None",  
+    SESSION_COOKIE_SECURE=True      
 )
 db = SQLAlchemy(app)
 date_str = '2025-02-19'
-date_format = '%Y-%m-%d'  # Adjusted format for just date
+date_format = '%Y-%m-%d'  
 parsed_date = datetime.strptime(date_str, date_format)
 
 class User(db.Model):
@@ -85,12 +85,12 @@ def login():
     print("username vppisa", username)
     session['username'] = username
 
-    if user and verify_password_django_pbkdf2(password, user.password):  # Replace with actual password check function
+    if user and verify_password_django_pbkdf2(password, user.password): 
         # Store username in session directly
         session['username'] = username
         session.permanent = True
 
-        print(f"Session after login: {session}")  # Debugging
+        print(f"Session after login: {session}") 
 
         # Send a response that includes session cookie
         response = make_response(jsonify({"message": "Login successful"}))
