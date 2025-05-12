@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 export default function OrderEdit() {
   const { orderId } = useParams();
-  console.log(orderId); // Check if it's printed correctly
+  console.log(orderId); 
 
   const [order, setOrder] = useState(null);
   const [formData, setFormData] = useState({
@@ -25,16 +25,15 @@ export default function OrderEdit() {
     opombe: ""
   });
 
-  // Fetch the order data
   useEffect(() => {
     axios
       .get(`http://localhost:5000/orders/${orderId}`)
       .then((response) => {
-        console.log(response.data); // Log the fetched order data
+        console.log(response.data);
         const data = response.data;
         setOrder(data);
         setFormData({
-            supplier: data.dobavitelj_id || "", // Assuming `dobavitelj_id` refers to supplier
+            supplier: data.dobavitelj_id || "", 
             evidence: data.evidencno_narocilo || "",
             orderType: data.vrsta_narocila || "",
             entryDate: data.datum_vnosa || "",
@@ -44,11 +43,11 @@ export default function OrderEdit() {
             priceWithoutTax: data.cena_brez_DDV || "",
             itemDescription: data.opis_narocila || "",
             remarks: data.opombe || "",
-            acceptConditions: data.status === "aktivna" || false, // Assuming `status` is used for accept conditions
+            acceptConditions: data.status === "aktivna" || false, 
             selectionCriteria: data.merilo_izbire || "",
             otherCriteria: data.zaporedna_stevilka || "",
             opis_narocila: data.opis_narocila || "",
-            opombe: data.opombe || "" // You might adjust this based on the intended field
+            opombe: data.opombe || "" 
           });
       })
       .catch((error) => console.error("Error fetching order:", error));
@@ -75,7 +74,7 @@ export default function OrderEdit() {
     e.preventDefault();
     try {
       await axios.put(`http://localhost:5000/orders/${orderId}`, formData);
-      window.location.href = "/orders"; // Redirecting
+      window.location.href = "/orders"; 
     } catch (error) {
       console.error("Error updating order:", error);
     }
@@ -87,7 +86,6 @@ export default function OrderEdit() {
     <div className="container mt-5 p-4 bg-light">
       <h3>Edit Order</h3>
       <form onSubmit={handleSubmit}>
-        {/* Supplier Field */}
         <div className="mb-3">
           <label className="form-label">Dobavitelj</label>
           <input
@@ -100,7 +98,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Evidence Field */}
         <div className="mb-3">
           <label className="form-label">Evidenčno naročilo</label>
           <select
@@ -116,7 +113,6 @@ export default function OrderEdit() {
           </select>
         </div>
 
-        {/* Order Type Field */}
         <div className="mb-3">
           <label className="form-label">Vrsta naročila</label>
           <select
@@ -135,7 +131,6 @@ export default function OrderEdit() {
           </select>
         </div>
 
-        {/* Entry Date Field */}
         <div className="mb-3">
           <label className="form-label">Datum vnosa</label>
           <input
@@ -147,7 +142,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Invoice Number Field */}
         <div className="mb-3">
           <label className="form-label">Številka predračuna</label>
           <input
@@ -160,7 +154,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Select Number Field */}
         <div className="mb-3">
           <label className="form-label">Številka izbire</label>
           <input
@@ -173,7 +166,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Quantity Field */}
         <div className="mb-3">
           <label className="form-label">Količina</label>
           <input
@@ -186,7 +178,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Price Without Tax Field */}
         <div className="mb-3">
           <label className="form-label">Cena brez DDV</label>
           <input
@@ -199,7 +190,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Item Description Field */}
         <div className="mb-3">
           <label className="form-label">Opis naročila</label>
           <textarea
@@ -211,7 +201,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Remarks Field */}
         <div className="mb-3">
           <label className="form-label">Opombe</label>
           <textarea
@@ -222,7 +211,6 @@ export default function OrderEdit() {
           />
         </div>
 
-        {/* Accept Conditions Field */}
         <div className="form-check mb-3">
           <input
             type="checkbox"
@@ -235,7 +223,6 @@ export default function OrderEdit() {
           <label className="form-check-label">Potrjujem pogoje</label>
         </div>
 
-        {/* Selection Criteria Field */}
         <div className="form-check mb-3">
           <input
             type="radio"
@@ -251,7 +238,6 @@ export default function OrderEdit() {
           </label>
         </div>
 
-        {/* Other Selection Criteria */}
         <div className="form-check mb-3">
           <input
             type="radio"

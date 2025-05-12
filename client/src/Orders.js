@@ -21,8 +21,8 @@ const OrderPage = () => {
         const fetchOrders = async () => {
             try {
                 const response = await axios.get('https://e-narocilnice-5.onrender.com/orders', {
-                    withCredentials: true, 
-                });
+                    withCredentials: true, // Include cookies with the request
+                });            
 
                 if (response?.data) {
                     setOrders(response.data);  

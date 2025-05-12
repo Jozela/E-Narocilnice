@@ -4,34 +4,29 @@ import "./Header.css";
 
 function Header() {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null); // Assume user info comes from some auth service
+  const [currentUser, setCurrentUser] = useState(null); 
 
-  // Example of fetching the current user (could be from context, Redux, etc.)
   useEffect(() => {
-    const user = { username: "Mihalavric" }; // This would come from your auth service
+    const user = { username: "Mihalavric" }; 
     setCurrentUser(user);
   }, []);
 
   const handleLogout = async () => {
     try {
-        // Send logout request to Flask backend
         const response = await fetch("https://e-narocilnice-5.onrender.com/logout", {
             method: "POST",
-            credentials: "include", // Ensures cookies are sent
+            credentials: "include", 
         });
 
         if (response.ok) {
             console.log("Logged out successfully");
 
-            // Clear localStorage and sessionStorage
             localStorage.removeItem("username");
             localStorage.removeItem("authToken");
             sessionStorage.removeItem("authToken");
 
-            // Delete cookies
             document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-            // Redirect to login page
             window.location.href = "/login";
         } else {
             console.error("Logout failed:", response.statusText);

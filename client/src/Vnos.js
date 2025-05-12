@@ -60,7 +60,7 @@ const OrderForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("/vnos", {
+            const response = await fetch("https://e-narocilnice-5.onrender.com/vnos", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
