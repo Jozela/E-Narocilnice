@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const ArchivePage = () => {
-    const { year } = useParams(); // Get the year from the URL
+    const { year } = useParams(); 
     const [orders, setOrders] = useState([]);
     const navigate = useNavigate();
 
@@ -15,7 +15,6 @@ const ArchivePage = () => {
                 });
 
                 if (response?.data) {
-                    // Filter orders by the selected year
                     const filteredOrders = response.data.filter(order => {
                         const orderYear = new Date(order.datumVnosa).getFullYear();
                         return orderYear.toString() === year;
