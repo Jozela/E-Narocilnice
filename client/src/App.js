@@ -39,10 +39,8 @@ function MainContent({ isAuthenticated, setIsAuthenticated }) {
     <div>
       {shouldRenderHeader && <Header />}
       <Routes>
-        {/* Public Route */}
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
 
-        {/* Protected Routes */}
         <Route path="/orders" element={isAuthenticated ? <OrderPage /> : <Navigate to="/login" />} />
         <Route path="/vnos" element={isAuthenticated ? <OrderForm /> : <Navigate to="/login" />} />
         <Route path="/archive/:year" element={isAuthenticated ? <ArchivePage /> : <Navigate to="/login" />} />

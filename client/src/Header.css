@@ -1,4 +1,3 @@
-/* Header Styles */
 .custom-navbar {
     background-color: #007bff !important; /* Blue background */
     padding: 10px 20px;
@@ -22,7 +21,6 @@
     border-radius: 5px;
 }
 
-/* Dropdown styles */
 .nav-item.dropdown .dropdown-menu {
     background-color: white;
     border-radius: 5px;
@@ -40,7 +38,6 @@
     color: white;
 }
 
-/* User Dropdown */
 #userDropdown {
     font-weight: bold;
     color: white !important;
@@ -51,7 +48,6 @@
     left: auto;
 }
 
-/* Button Hover Effects */
 button.dropdown-item {
     width: 100%;
     text-align: left;
@@ -67,7 +63,6 @@ button.dropdown-item:hover {
     color: white;
 }
 
-/* Mobile Navbar Toggle */
 .navbar-toggler {
     border: none;
 }
@@ -76,7 +71,6 @@ button.dropdown-item:hover {
     filter: invert(1);
 }
 
-/* Adjustments for User Dropdown */
 .navbar-nav .dropdown-menu-end {
     min-width: 180px;
 }
