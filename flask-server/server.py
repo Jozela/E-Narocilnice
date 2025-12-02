@@ -16,6 +16,8 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib.units import cm
 import io
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 app = Flask(__name__, static_folder='client/build', static_url_path='')
 
@@ -29,18 +31,22 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = False  
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  
-app.secret_key = 'your-secret-key' 
-
+#9Xvih107TLtMpQM2mO_ZMg
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    'postgresql://uacllgann1lh52:pb8fd795174bbd64c4dbe1a3b89bf3916540dd739575da57c098074cd7bf86a9e'
-    '@cdbag44qc0vu1j.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d7dgl7a350n8u'
+    'cockroachdb+psycopg2://joze:9Xvih107TLtMpQM2mO_ZMg@'
+    'stormy-bug-9675.jxf.gcp-europe-west3.cockroachlabs.cloud:26257/defaultdb'
+    '?sslmode=verify-full&sslrootcert=C:\\Users\\jozec\\AppData\\Roaming\\postgresql\\root.crt'
 )
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'supersecretkey'
+
 #CORS(app)
-CORS(app, supports_credentials=True)
+CORS(app, origins="http://localhost:3000", supports_credentials=True)
+
 app.config.update(
-    SESSION_COOKIE_SAMESITE="None",  
-    SESSION_COOKIE_SECURE=True      
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=False
 )
 db = SQLAlchemy(app)
 date_str = '2025-02-19'
@@ -74,7 +80,7 @@ def verify_password_django_pbkdf2(password: str, stored_hash: str) -> bool:
 
 # Login route
 @app.route('/login', methods=['POST'])
-@cross_origin(origins="https://clever-dasik-75eefa.netlify.app", supports_credentials=True)
+@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def login():
     data = request.get_json()  # Ensure it's a JSON request
     username = data.get('username')
@@ -85,16 +91,16 @@ def login():
     print("username vppisa", username)
     session['username'] = username
 
-    if user and verify_password_django_pbkdf2(password, user.password): 
-        # Store username in session directly
-        session['username'] = username
-        session.permanent = True
-
-        print(f"Session after login: {session}") 
-
-        # Send a response that includes session cookie
+    if user and user.password == password:
+        # Send a plain cookie with username
         response = make_response(jsonify({"message": "Login successful"}))
-        response.set_cookie('session', session.get('username'), httponly=True, samesite='Lax')
+        response.set_cookie(
+            'username',        # Cookie name
+            username,          # Plain text value
+            httponly=True,     # Optional: prevent JS access
+            samesite='Lax',    # Adjust if needed
+            secure=False       # True if HTTPS
+        )
         return response, 200
 
     else:
@@ -102,7 +108,7 @@ def login():
 
 # Logout route
 @app.route('/logout', methods=['POST', 'GET'])
-@cross_origin(origins="https://clever-dasik-75eefa.netlify.app", supports_credentials=True)
+@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def logout():
     session.clear()
     session.pop('username', None)  # Clear username from session
@@ -161,16 +167,24 @@ def update_order(order_id):
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
 
 
+@app.route('/orders2', methods=['GET'])
+def get_orders_test():
+    orders = Order.query.all()
+    result = [o.to_dict() for o in orders]
+    print("Orders in DB:", result)
+    return jsonify(result)
+
+
 # Route to get orders (without Flask-Login)
 @app.route('/orders', methods=['GET'])
-@cross_origin(origins="https://clever-dasik-75eefa.netlify.app", supports_credentials=True)
+@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def get_orders():
     year = request.args.get('year')  # Get 'year' from query params
     order_type = request.args.get('type')
     print(session.get('username', 'No session data'))
     if 'username' not in session:
         return jsonify({"message": "Not logged in"} + {session['username']}), 401
-    current_user_username = session['username']
+    current_user_username = "admin"
     #user_orders = Order.query.filter_by(vnasatelj=current_user_username).all()
     #user_orders = Order.query.filter_by(vnasatelj=current_user_username).all() 
     
@@ -241,7 +255,8 @@ class Order(db.Model):
     __tablename__ = 'narocilnice_narocilnica'
     
     # Primary key
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    #id = db.Column(db.Integer, primary_key=True)
     
     # Other fields with correct names as per Blazor model
     vnasatelj = db.Column(db.String(255), nullable=True)  # Corresponds to 'Vnasatelj'
@@ -255,7 +270,7 @@ class Order(db.Model):
     merilo_izbire = db.Column(db.String(255), nullable=True)  # Corresponds to 'MeriloIzbire'
     status = db.Column(db.String(50), nullable=True)  # Corresponds to 'Status'
     odobril = db.Column(db.String(255), nullable=True)  # Corresponds to 'Odobril'
-    dobavitelj_id = db.Column(db.Integer, nullable=True)  # Corresponds to 'DobaviteljId'
+    dobavitelj_id = db.Column(UUID(as_uuid=True), db.ForeignKey('narocilnice_dobavitelj.id'), nullable=True)
     organizacija_id = db.Column(db.Integer, nullable=True)  # Corresponds to 'OrganizacijaId'
     vrsta_narocila = db.Column(db.String(255), nullable=True)  # Corresponds to 'VrstaNarocila'
     kolicina = db.Column(db.Integer, nullable=True)  # Corresponds to 'Kolicina'
@@ -264,13 +279,13 @@ class Order(db.Model):
     zaporedna_stevilka = db.Column(db.String(255), nullable=True) 
     cena_brez_DDV = db.Column(db.String(255), nullable=True) 
     skupna_cena = db.Column(db.Float, nullable=True)  # Corresponds to 'SkupnaCena'
-    zaporedna_stevilka_2018 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2018'
-    zaporedna_stevilka_2019 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2019'
-    zaporedna_stevilka_2020 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2020'
-    zaporedna_stevilka_2021 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2021'
-    zaporedna_stevilka_2022 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2022'
-    zaporedna_stevilka_2024 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2024'
-    zaporedna_stevilka_2023 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2023'
+    #zaporedna_stevilka_2018 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2018'
+    #zaporedna_stevilka_2019 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2019'
+    #zaporedna_stevilka_2020 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2020'
+    #zaporedna_stevilka_2021 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2021'
+    #zaporedna_stevilka_2022 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2022'
+    #zaporedna_stevilka_2024 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2024'
+    #zaporedna_stevilka_2023 = db.Column(db.String(255), nullable=True)  # Corresponds to 'ZaporednaStevilka2023'
 
     def to_dict(self):
         """Convert the Order object to a dictionary."""
@@ -296,20 +311,20 @@ class Order(db.Model):
             'zaporedna_stevilka': self.zaporedna_stevilka,
             'cena_brez_DDV': self.cena_brez_DDV,
             'skupna_cena': self.skupna_cena,
-            'zaporedna_stevilka_2018': self.zaporedna_stevilka_2018,
-            'zaporedna_stevilka_2019': self.zaporedna_stevilka_2019,
-            'zaporedna_stevilka_2020': self.zaporedna_stevilka_2020,
-            'zaporedna_stevilka_2021': self.zaporedna_stevilka_2021,
-            'zaporedna_stevilka_2022': self.zaporedna_stevilka_2022,
-            'zaporedna_stevilka_2024': self.zaporedna_stevilka_2024,
-            'zaporedna_stevilka_2023': self.zaporedna_stevilka_2023
+            #'zaporedna_stevilka_2018': self.zaporedna_stevilka_2018,
+            #'zaporedna_stevilka_2019': self.zaporedna_stevilka_2019,
+            #'zaporedna_stevilka_2020': self.zaporedna_stevilka_2020,
+            #'zaporedna_stevilka_2021': self.zaporedna_stevilka_2021,
+            #'zaporedna_stevilka_2022': self.zaporedna_stevilka_2022,
+            #'zaporedna_stevilka_2024': self.zaporedna_stevilka_2024,
+            #'zaporedna_stevilka_2023': self.zaporedna_stevilka_2023
         }
 
 
 
 class Dobavitelj(db.Model):
     __tablename__ = 'narocilnice_dobavitelj'  # Update to the correct table name
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     naziv = db.Column(db.String(255), nullable=False)
     ulica = db.Column(db.String(255)) 
     postna_stevilka = db.Column(db.String(255)) 
@@ -456,36 +471,48 @@ def get_suppliers():
 def submit_order():
     data = request.json
     try:
+        # Get a valid dobavitelj_id from the request or default to first supplier in DB
+        dobavitelj_id = data.get('dobaviteljId')
+        if dobavitelj_id:
+            # Make sure it's a UUID
+            dobavitelj_id = str(dobavitelj_id)
+        else:
+            # Pick first supplier from DB as default
+            first_supplier = Dobavitelj.query.first()
+            if not first_supplier:
+                return jsonify({'error': 'No supplier found in database'}), 400
+            dobavitelj_id = str(first_supplier.id)
+
         new_order = Order(
-            vnasatelj=session['username'],  # Corresponds to 'Vnasatelj'
-            datum_vnosa=datetime.strptime(data['entryDate'], '%Y-%m-%d'),  # Corresponds to 'DatumVnosa'
-            datum_spremembe=datetime.strptime(data['entryDate'], '%Y-%m-%d'),  # Corresponds to 'DatumSpremembe' (if available)
-            evidencno_narocilo=data['evidence'],  # Corresponds to 'EvidencnoNarocilo'
-            stevilka_predracuna=data.get('invoiceNumber', None),  # Corresponds to 'StevilkaPredracuna'
-            stevilka_izbire=data.get('selectNumber', None),  # Corresponds to 'StevilkaIzbire'
-            opis_narocila=data['itemDescription'],  # Corresponds to 'OpisNarocila'
-            opombe=data.get('remarks', None),  # Corresponds to 'Opombe'
-            merilo_izbire=data['selectionCriteria'],  # Corresponds to 'MeriloIzbire'
-            status="aktivna",  # Corresponds to 'Status'
-            odobril=data.get('approval', None),  # Corresponds to 'Odobril'
-            dobavitelj_id=1900,  # Corresponds to 'DobaviteljId'
-            organizacija_id=1,  # Corresponds to 'OrganizacijaId'
-            vrsta_narocila=data['orderType'],  # Corresponds to 'VrstaNarocila'
-            kolicina=data['quantity'],  # Corresponds to 'Kolicina'
-            narocilo=data['item'],  # Corresponds to 'Narocilo'
-            merska_enota=data['me'],  # Corresponds to 'MerskaEnota'
-            zaporedna_stevilka=data.get('serialNumber', None),  # Corresponds to 'ZaporednaStevilka'
-            skupna_cena=data.get('totalPrice', None),
-            cena_brez_DDV = data.get('priceWithoutTax', None)
+            vnasatelj="admin",
+            datum_vnosa=datetime.strptime(data['entryDate'], '%Y-%m-%d'),
+            datum_spremembe=datetime.strptime(data['entryDate'], '%Y-%m-%d'),
+            evidencno_narocilo=data['evidence'],
+            stevilka_predracuna=data.get('invoiceNumber'),
+            stevilka_izbire=data.get('selectNumber'),
+            opis_narocila=data['itemDescription'],
+            opombe=data.get('remarks'),
+            merilo_izbire=data['selectionCriteria'],
+            status="aktivna",
+            odobril=data.get('approval'),
+            dobavitelj_id=dobavitelj_id,  # UUID from DB
+            organizacija_id=1,
+            vrsta_narocila=data['orderType'],
+            kolicina=data['quantity'],
+            narocilo=data['item'],
+            merska_enota=data['me'],
+            zaporedna_stevilka=1,
+            skupna_cena=data.get('totalPrice'),
+            cena_brez_DDV=data.get('priceWithoutTax')
         )
         db.session.add(new_order)
         db.session.commit()
         return jsonify({'message': 'Order submitted successfully!'}), 201
     except Exception as e:
-        print(data)
         import traceback
         print("Error Traceback:", traceback.format_exc())
         return jsonify({'error': str(e)}), 400
+
 
 @app.route('/set_session')
 def set_session():
@@ -507,6 +534,8 @@ def get_session():
 #     opis_narocila = db.Column(db.String(255), nullable=False)
 #     status = db.Column(db.String(50), default='Active')
 #     vnasatelj = db.Column(db.String(150), nullable=False)  # This is the username field
-
+with app.app_context():
+    db.create_all()
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
+    app.run(host="localhost", port=5000, debug=True)
+

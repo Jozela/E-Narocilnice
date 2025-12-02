@@ -13,17 +13,14 @@ from server import app, db, User, Order, Dobavitelj
 class FlaskAppTestCase(unittest.TestCase):
 
     def setUp(self):
-        # Set up the application context
         #dobavitelj = Dobavitelj(id=8168, name="Test Supplier")  # Example supplier
         #db.session.add(dobavitelj)
         self.app = app
         self.app_context = self.app.app_context()
         self.app_context.push()
 
-        # Set up the database
         db.create_all()
 
-        # Ensure the user exists, create one if not
         self.existing_user = User.query.filter_by(username='mihalavric').first()
         if not self.existing_user:
             self.user = User(
@@ -40,7 +37,6 @@ class FlaskAppTestCase(unittest.TestCase):
         else:
             self.user = self.existing_user
 
-        # Set up the session with the user
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
                 sess['user_id'] = self.user.id
@@ -114,32 +110,31 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_create_order(self):
         order = Order(
-            vnasatelj="Test Vnasatelj",  # Example of the 'Vnasatelj' field
-            datum_vnosa=datetime.now(),  # 'DatumVnosa' - DateTime field
-            datum_spremembe=datetime.now(),  # 'DatumSpremembe' - DateTime field
-            evidencno_narocilo="Testoclo",  # 'EvidencnoNarocilo' - String field
-            stevilka_predracuna="Preun",  # 'StevilkaPredracuna' - String field
-            stevilka_izbire="1",  # 'StevilkaIzbire' - String field
-            opis_narocila="Testcn",  # 'OpisNarocila' - String field
-            opombe="Soments",  # 'Opombe' - Text field
-            merilo_izbire="Critia",  # 'MeriloIzbire' - String field
-            status="Pending",  # 'Status' - String field
-            odobril="Teser",  # 'Odobril' - String field
-            dobavitelj_id=8168,  # 'DobaviteljId' - Integer field
-            organizacija_id=1,  # 'OrganizacijaId' - Integer field
-            vrsta_narocila="Proder",  # 'VrstaNarocila' - String field
-            kolicina=10,  # 'Kolicina' - Integer field
-            narocilo="Test Or",  # 'Narocilo' - String field
-            merska_enota="pcs",  # 'MerskaEnota' - String field
-            zaporedna_stevilka="SN123",  # 'ZaporednaStevilka' - String field
-            cena_brez_DDV="100.00",  # 'CenaBrezDDV' - String field
-            skupna_cena=120.00,  # 'SkupnaCena' - Float field
+            vnasatelj="Test Vnasatelj",  
+            datum_vnosa=datetime.now(),  
+            datum_spremembe=datetime.now(),  
+            evidencno_narocilo="Testoclo",
+            stevilka_predracuna="Preun",
+            stevilka_izbire="1", 
+            opis_narocila="Testcn", 
+            opombe="Soments", 
+            merilo_izbire="Critia",
+            status="Pending", 
+            odobril="Teser",  
+            dobavitelj_id=8168,
+            organizacija_id=1, 
+            vrsta_narocila="Proder",
+            kolicina=10, 
+            narocilo="Test Or",
+            merska_enota="pcs",
+            zaporedna_stevilka="SN123", 
+            cena_brez_DDV="100.00", 
+            skupna_cena=120.00, 
         )
         
         db.session.add(order)
         db.session.commit()
         
-        # Assert the order was created and has an id
         self.assertIsNotNone(order.id)
         self.assertEqual(order.vnasatelj, "Test Vnasatelj")
         self.assertEqual(order.status, "Pending")
