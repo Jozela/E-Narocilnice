@@ -12,16 +12,14 @@ const OrderPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Get the username from localStorage (or sessionStorage)
         if (savedUsername) {
             setUsername(savedUsername);
         }
 
-        // Fetch orders from the API
         const fetchOrders = async () => {
             try {
-                const response = await axios.get('https://e-narocilnice-5.onrender.com/orders', {
-                    withCredentials: true, // Include cookies with the request
+                const response = await axios.get('http://localhost:5000/orders', {
+                    withCredentials: true,
                 });            
 
                 if (response?.data) {
@@ -41,7 +39,7 @@ const OrderPage = () => {
 
     useEffect(() => {
         console.log('Updated orders:', orders);
-    }, [orders]); // Logs orders whenever they change
+    }, [orders]);
 
     const handleSort = (column) => {
         const sortedOrders = [...orders];
@@ -56,12 +54,11 @@ const OrderPage = () => {
         setCurrentSortColumn(column);
     };
     const handleEdit = (orderId) => {
-        // Navigate to the edit page for the specific order
         navigate(`/orders/edit/${orderId}`);
     };
     const DownloadOrderPdf = async (orderId) => {
         try {
-          const response = await fetch(`https://e-narocilnice-5.onrender.com/api/orders-pdf/${orderId}`, {
+          const response = await fetch(`localhost:5000/${orderId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -69,11 +66,11 @@ const OrderPage = () => {
           });
     
           if (response.ok) {
-            const blob = await response.blob(); // Get the PDF file as a Blob
+            const blob = await response.blob(); 
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob); // Create a URL for the Blob
-            link.download = `Order_${orderId}.pdf`; // Name the file
-            link.click(); // Trigger the download
+            link.href = URL.createObjectURL(blob);
+            link.download = `Order_${orderId}.pdf`; 
+            link.click(); 
           } else {
             console.error("Failed to download PDF");
           }
@@ -83,7 +80,7 @@ const OrderPage = () => {
       };
 
     const handlePrint = () => {
-        window.print(); // Triggers the print dialog
+        window.print(); 
     };
 
     return (
@@ -120,7 +117,7 @@ const OrderPage = () => {
                         <th>
                             <button onClick={() => handleSort('dobaviteljName')}>Opombe</button>
                         </th>
-                        {/* Remove 'Naslov' column if not available */}
+                        {}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -141,7 +138,7 @@ const OrderPage = () => {
                                 <td>{order.status}</td>
                                 <td>{order.opombe}</td>
 
-                                {/* Remove 'naslov' if it's not part of the order */}
+                                {}
                                 <td>
                                 <button className="btn btn-warning btn-sm" onClick={() => handleEdit(order.id)}>Edit</button>
                                 <button className="btn btn-danger btn-sm">Cancel</button>

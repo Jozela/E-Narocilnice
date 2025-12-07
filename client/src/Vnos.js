@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const OrderForm = () => {
     const [suppliers, setSuppliers] = useState([]);
-    const [currentUser] = useState(null); // Assume user info comes from some auth service
+    const [currentUser] = useState(null); 
     const [formData, setFormData] = useState({
         supplier: "",
         evidence: "",
@@ -23,7 +23,7 @@ const OrderForm = () => {
     });
 
     useEffect(() => {
-        fetch("/suppliers")
+        fetch("http://localhost:5000/suppliers") // include full URL with port
             .then((res) => res.json())
             .then((data) => setSuppliers(data))
             .catch((error) => console.error("Error fetching suppliers:", error));
@@ -47,7 +47,6 @@ const OrderForm = () => {
     
       const handleCheckboxChange = (event) => {
         const { id, checked } = event.target;
-        // Handle checkbox logic if needed
         console.log(`${id} is ${checked ? 'checked' : 'unchecked'}`);
       };
     
@@ -60,7 +59,7 @@ const OrderForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("https://e-narocilnice-5.onrender.com/vnos", {
+            const response = await fetch("http://localhost:5000/vnos", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -69,7 +68,7 @@ const OrderForm = () => {
             const result = await response.json();
             if (response.ok) {
                 alert("Order submitted successfully!");
-                setFormData({ ...formData, supplier: "", item: "" }); // Reset form
+                setFormData({ ...formData, supplier: "", item: "" });
             } else {
                 alert(`Error: ${result.error}`);
             }

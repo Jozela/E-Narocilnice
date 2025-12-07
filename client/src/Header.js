@@ -7,7 +7,7 @@ function Header() {
   const [currentUser, setCurrentUser] = useState(null); 
 
   useEffect(() => {
-    const user = { username: "Mihalavric" }; 
+    const user = { username: "admin" }; 
     setCurrentUser(user);
   }, []);
 
@@ -43,7 +43,6 @@ function Header() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
       <div className="container-fluid">
-        {/* Logo/Menu Toggle */}
         <button
           className="navbar-toggler"
           type="button"
@@ -59,7 +58,6 @@ function Header() {
           naročilnica
         </a>
 
-        {/* Navigation Links */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
@@ -127,7 +125,6 @@ function Header() {
             </li>
           </ul>
 
-          {/* User Info */}
           <ul className="navbar-nav">
             <li className="nav-item dropdown">
               {currentUser ? (
@@ -160,7 +157,7 @@ function Header() {
                   className="nav-link"
                   onClick={() => handleNavigate("/login")}
                 >
-                  Prijavljen kot: N/A
+                  Prijavljen kot: Admin
                 </a>
               )}
             </li>

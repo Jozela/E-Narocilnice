@@ -12,11 +12,10 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');  // Reset any previous error message
+        setError(''); 
     
         try {
-            // Send POST request to Flask backend for login
-            const response = await fetch('https://e-narocilnice-5.onrender.com/login', {
+            const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
                 withCredentials: true,
                 headers: { 'Content-Type': 'application/json' },
@@ -28,14 +27,12 @@ const Login = () => {
             setLoading(false);
     
             if (response.ok) {
-                // Successful login
                 console.log("Login successful:", data);
                 //setIsAuthenticated(true);
                 localStorage.setItem('authToken', 'some-token-value');
-                localStorage.setItem('username', username);  // Save username to localStorage
+                localStorage.setItem('username', username); 
                 window.location.href = '/orders';
             } else {
-                // Handle invalid login or server error
                 setError(data.message || 'Invalid login. Please check your credentials.');
             }
         } catch (error) {
@@ -50,7 +47,7 @@ const Login = () => {
         <div className="container mt-5">
             <div className="row justify-content-center">
                 <div className="col-md-4">
-                    <h2 className="text-center">Login</h2>
+                <h2 style={{ color: '#1e3a8a' }} className="text-center">E-Narocilnice</h2>
                     {error && <div className="alert alert-danger">{error}</div>}
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">

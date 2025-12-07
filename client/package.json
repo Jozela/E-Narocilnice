@@ -24,6 +24,10 @@
     "dev": "next dev",
     "eject": "react-scripts eject"
   },
+  "options": {
+    "allowedHosts": ["localhost", ".localhost"],
+    "proxy": "https://localhost:3386/"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
