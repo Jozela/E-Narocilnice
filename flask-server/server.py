@@ -22,19 +22,24 @@ app = Flask(__name__, static_folder='client/build', static_url_path='')
 @app.route('/')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
-app.secret_key = 'supersecretkey'  
-app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SESSION_PERMANENT'] = True  
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SECURE'] = False  
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  
-app.secret_key = 'your-secret-key' 
+app.secret_key = 'supersecretkey'  # only once
 
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    'postgresql://uacllgann1lh52:pb8fd795174bbd64c4dbe1a3b89bf3916540dd739575da57c098074cd7bf86a9e'
-    '@cdbag44qc0vu1j.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d7dgl7a350n8u'
-)
+import os
+
+# Always use SQLite in testing
+if "pytest" in sys.modules:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL",
+        "postgresql://uacllgann1lh52:pb8fd795174bbd64c4dbe1a3b89bf3916540dd739575da57c098074cd7bf86a9e"
+        "@cdbag44qc0vu1j.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d7dgl7a350n8u"
+    )
+
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #CORS(app)
 CORS(app, supports_credentials=True)
@@ -351,11 +356,23 @@ def generate_order_pdf(order_id):
 
     # Dobavitelj podatki
     pdf.setFont("Helvetica-Bold", 12)
-    pdf.drawString(40, height - 170, dobavitelj.naziv)
+
+    if dobavitelj:
+        pdf.drawString(40, height - 170, dobavitelj.naziv or "")
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(40, height - 185, f"{dobavitelj.postna_stevilka or ''} {dobavitelj.kraj or ''}")
+        pdf.drawString(40, height - 200, dobavitelj.naslov or "")
+        pdf.drawString(40, height - 215, f"Matična: {dobavitelj.maticna}")
+    else:
+        pdf.drawString(40, height - 170, "Dobavitelj ni izbran")
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(40, height - 185, "")
+        pdf.drawString(40, height - 200, "")
+
     pdf.setFont("Helvetica", 10)
-    pdf.drawString(40, height - 185, f"{dobavitelj.postna_stevilka}")
-    pdf.drawString(40, height - 200, f"{dobavitelj.ulica}")
-    pdf.drawString(40, height - 215, f"Matična: {dobavitelj.maticna}")
+    #pdf.drawString(40, height - 185, f"{dobavitelj.postna_stevilka}")
+    #pdf.drawString(40, height - 200, f"{dobavitelj.ulica}")
+    #pdf.drawString(40, height - 215, f"Matična: {dobavitelj.maticna}")
 
     # Podatki o naročilu
     pdf.setFont("Helvetica-Bold", 10)
@@ -371,8 +388,14 @@ def generate_order_pdf(order_id):
     # Tabela naročila
     table_data = [
         ["Zap. št.", "Naziv", "Količina", "M.E.", "Cena", "Vrednost"],
-        [1, order.opis_narocila, order.kolicina, order.merska_enota, f"{order.cena_brez_DDV:.2f}", "-"]
+        [1,
+        order.opis_narocila or "",
+        order.kolicina or 0,
+        order.merska_enota or "",
+        f"{(order.cena_brez_DDV or 0):.2f}",
+        "-"]
     ]
+
 
     table = Table(table_data, colWidths=[2 * cm, 6 * cm, 2.5 * cm, 2.5 * cm, 3 * cm, 3 * cm])
     table.setStyle(TableStyle([
@@ -394,7 +417,7 @@ def generate_order_pdf(order_id):
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(40, height - 380, "Opombe:")
     pdf.setFont("Helvetica", 10)
-    pdf.drawString(100, height - 380, order.opombe)
+    pdf.drawString(100, height - 380, order.opombe or "")
 
     # Skupna vrednost
     pdf.setFont("Helvetica-Bold", 10)
