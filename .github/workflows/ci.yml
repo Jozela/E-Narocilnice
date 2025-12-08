@@ -34,7 +34,7 @@ jobs:
         with:
           name: frontend-coverage
           path: ./client/coverage
-
+  
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
@@ -58,15 +58,13 @@ jobs:
   
       - name: Verify import works
         working-directory: flask-server
-        run: |
-          python -c "from server import app, db, User, Order; print('Imports OK')"
+        run: python -c "from server import app, db, User, Order; print('Imports OK')"
   
       - name: Run backend tests
         working-directory: flask-server
         run: pytest -v tests/
   
-
-
+  
 
 
   deploy:
