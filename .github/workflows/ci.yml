@@ -61,7 +61,8 @@ jobs:
         run: |
           echo "Workspace: $GITHUB_WORKSPACE"
           echo "PYTHONPATH: $PYTHONPATH"
-          ls -R .
+          echo "Contents of flask-server directory:"
+          ls -R flask-server/
   
       - name: Verify server.py is importable
         working-directory: flask-server
@@ -78,7 +79,12 @@ jobs:
       - name: Run backend tests
         working-directory: flask-server
         run: |
-          pytest -vv tests/
+          echo "Running pytest on all test files..."
+          # List tests directory to confirm files are present
+          ls -R tests/
+          # Explicitly run test file (adjust if you rename it to test_example.py)
+          pytest -vv tests/test.py || exit 1
+
 
   
 
