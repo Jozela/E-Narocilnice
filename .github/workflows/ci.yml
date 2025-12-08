@@ -56,11 +56,15 @@ jobs:
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=${GITHUB_WORKSPACE}/flask-server" >> $GITHUB_ENV
   
-      - name: Run backend tests
+      - name: Verify import works
         working-directory: flask-server
         run: |
-          echo "Running backend tests..."
-          pytest -v tests/
+          python -c "from server import app, db, User, Order; print('Imports OK')"
+  
+      - name: Run backend tests
+        working-directory: flask-server
+        run: pytest -v tests/
+  
 
 
 
