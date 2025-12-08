@@ -54,11 +54,14 @@ jobs:
           pip install pytest
   
       - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}/flask-server" >> $GITHUB_ENV
   
       - name: Run backend tests
         working-directory: flask-server
-        run: pytest tests/test.py
+        run: |
+          echo "Running backend tests..."
+          pytest -v tests/
+
 
 
 
