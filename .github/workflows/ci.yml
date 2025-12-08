@@ -53,16 +53,32 @@ jobs:
           pip install -r flask-server/requirements.txt
           pip install pytest
   
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}/flask-server" >> $GITHUB_ENV
+      - name: Fix Python path
+        run: |
+          echo "PYTHONPATH=${GITHUB_WORKSPACE}/flask-server" >> $GITHUB_ENV
   
-      - name: Verify import works
+      - name: Debug paths
+        run: |
+          echo "Workspace: $GITHUB_WORKSPACE"
+          echo "PYTHONPATH: $PYTHONPATH"
+          ls -R .
+  
+      - name: Verify server.py is importable
         working-directory: flask-server
-        run: python -c "from server import app, db, User, Order; print('Imports OK')"
+        run: |
+          python - << 'EOF'
+          try:
+              from server import app, db, User, Order
+              print("IMPORT SUCCESSFUL")
+          except Exception as e:
+              print("IMPORT FAILED:", e)
+              raise
+          EOF
   
       - name: Run backend tests
         working-directory: flask-server
-        run: pytest -v tests/
+        run: |
+          pytest -vv tests/
 
   
 
