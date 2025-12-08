@@ -34,32 +34,38 @@ jobs:
         with:
           name: frontend-coverage
           path: ./client/coverage
-
+  
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/pre-production'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+  
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          node-version: 20
-
+          python-version: '3.11'
+  
       - name: Install backend dependencies
-        run: npm install
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r flask-server/requirements.txt
+  
+      - name: Run backend tests
+        run: |
+          source venv/bin/activate
+          pytest --cov=flask-server --cov-report=xml
         working-directory: ./flask-server
-
-      - name: Run backend tests with coverage
-        run: npm test -- --coverage
-        working-directory: ./flask-server
-
-      - name: Upload backend coverage as artifact
+  
+      - name: Upload backend coverage
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: ./server/coverage
+          path: ./flask-server/coverage.xml
+
 
   deploy:
     name: Deploy
