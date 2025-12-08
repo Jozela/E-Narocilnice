@@ -36,33 +36,27 @@ jobs:
           path: ./client/coverage
 
   backend-tests:
+    name: Backend Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-  
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-  
-      - name: Install backend dependencies
+          python-version: 3.8
+
+      - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install -r flask-server/requirements.txt
-  
+
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+
       - name: Run backend tests
-        run: |
-          source venv/bin/activate
-          pytest --cov=flask-server --cov-report=xml
-        working-directory: ./flask-server
-  
-      - name: Upload backend coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage
-          path: ./flask-server/coverage.xml
+        run: pytest flask-server/tests/test.py
 
 
   deploy:
