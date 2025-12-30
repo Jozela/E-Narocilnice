@@ -39,33 +39,54 @@ jobs:
           name: frontend-coverage
           path: client/coverage
 
-  backend-tests:
+backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: python-${{ hashFiles('flask-server/requirements.txt') }}
-
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r flask-server/requirements.txt
           pip install pytest
 
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=${GITHUB_WORKSPACE}/flask-server" >> $GITHUB_ENV
+      - name: Fix Python path
+        run: |
+          echo "PYTHONPATH=${GITHUB_WORKSPACE}/flask-server" >> $GITHUB_ENV
+
+      - name: Debug paths
+        run: |
+          echo "Workspace: $GITHUB_WORKSPACE"
+          echo "PYTHONPATH: $PYTHONPATH"
+          echo "Contents of flask-server directory:"
+          ls -R flask-server/
+
+      - name: Verify server.py is importable
+        working-directory: flask-server
+        run: |
+          python - << 'EOF'
+          try:
+              from server import app, db, User, Order
+              print("IMPORT SUCCESSFUL")
+          except Exception as e:
+              print("IMPORT FAILED:", e)
+              raise
+          EOF
 
       - name: Run backend tests
         working-directory: flask-server
-        run: pytest -vv tests/
+        run: |
+          echo "Running pytest on all test files..."
+          ls -R tests/
+          pytest -vv tests/test.py || exit 1
+
 
   build:
     name: Build Frontend & Backend
