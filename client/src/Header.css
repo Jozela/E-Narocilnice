@@ -1,0 +1,76 @@
+.custom-navbar {
+    background-color: red !important; /* Blue background */
+    padding: 10px 20px;
+}
+
+.navbar-brand {
+    font-size: 22px;
+    font-weight: bold;
+    color: white !important;
+    text-transform: uppercase;
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    font-size: 16px;
+    padding: 10px 15px;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+.nav-item.dropdown .dropdown-menu {
+    background-color: white;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nav-item.dropdown .dropdown-menu .dropdown-item {
+    color: #333;
+    font-size: 14px;
+}
+
+.nav-item.dropdown .dropdown-menu .dropdown-item:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+#userDropdown {
+    font-weight: bold;
+    color: white !important;
+}
+
+.navbar-nav .dropdown-menu-end {
+    right: 0;
+    left: auto;
+}
+
+button.dropdown-item {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button.dropdown-item:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.navbar-nav .dropdown-menu-end {
+    min-width: 180px;
+}

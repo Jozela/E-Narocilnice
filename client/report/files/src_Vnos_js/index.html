@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src\Vnos.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src\Vnos.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">68.59</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">378</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">27.83</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.37</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import React, { useState, useEffect } from &quot;react&quot;;
+
+const OrderForm = () =&gt; {
+    const [suppliers, setSuppliers] = useState([]);
+    const [currentUser] = useState(null); // Assume user info comes from some auth service
+    const [formData, setFormData] = useState({
+        supplier: &quot;&quot;,
+        evidence: &quot;&quot;,
+        orderType: &quot;&quot;,
+        entryDate: &quot;&quot;,
+        invoiceNumber: &quot;&quot;,
+        selectNumber: &quot;&quot;,
+        quantity: 1,
+        me: &quot;&quot;,
+        priceWithoutTax: 0,
+        itemDescription: &quot;&quot;,
+        item: &quot;&quot;,
+        remarks: &quot;&quot;,
+        acceptConditions: false,
+        selectionCriteria: &quot;&quot;,
+        otherCriteria: &quot;&quot;,
+        username: currentUser ? currentUser.username : &quot;&quot;
+    });
+
+    useEffect(() =&gt; {
+        fetch(&quot;/suppliers&quot;)
+            .then((res) =&gt; res.json())
+            .then((data) =&gt; setSuppliers(data))
+            .catch((error) =&gt; console.error(&quot;Error fetching suppliers:&quot;, error));
+    }, []);
+
+    const handleChange = (e) =&gt; {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === &quot;checkbox&quot; ? checked : value
+        });
+    };
+    const handleRadioChange = (event) =&gt; {
+        const { value } = event.target;
+        setFormData((prevFormData) =&gt; ({
+          ...prevFormData,
+          selectionCriteria: value,
+          isCriteria6Selected: value === &#039;Druga merila&#039; ? true : prevFormData.isCriteria6Selected
+        }));
+      };
+    
+      const handleCheckboxChange = (event) =&gt; {
+        const { id, checked } = event.target;
+        // Handle checkbox logic if needed
+        console.log(`${id} is ${checked ? &#039;checked&#039; : &#039;unchecked&#039;}`);
+      };
+    
+      const handleTextareaChange = (event) =&gt; {
+        setFormData((prevFormData) =&gt; ({
+          ...prevFormData,
+          otherCriteria: event.target.value
+        }));
+      };
+    const handleSubmit = async (e) =&gt; {
+        e.preventDefault();
+        try {
+            const response = await fetch(&quot;/vnos&quot;, {
+                method: &quot;POST&quot;,
+                headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+                body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(&quot;Order submitted successfully!&quot;);
+                setFormData({ ...formData, supplier: &quot;&quot;, item: &quot;&quot; }); // Reset form
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error(&quot;Submission error:&quot;, error);
+        }
+    };
+
+    return (
+        &lt;div className=&quot;container mt-5 p-4 bg-light&quot;&gt;
+            &lt;h3&gt;Vnesite podatke za naročilnico&lt;/h3&gt;
+            &lt;form onSubmit={handleSubmit}&gt;
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Dobavitelj&lt;/label&gt;
+                    &lt;input
+                        type=&quot;text&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;supplier&quot;
+                        list=&quot;suppliers&quot;
+                        value={formData.supplier}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                    &lt;datalist id=&quot;suppliers&quot;&gt;
+                        {suppliers.map((s) =&gt; (
+                            &lt;option key={s.id} value={s.name} /&gt;
+                        ))}
+                    &lt;/datalist&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Evidenčno naročilo&lt;/label&gt;
+                    &lt;select
+                        className=&quot;form-select&quot;
+                        name=&quot;evidence&quot;
+                        value={formData.evidence}
+                        onChange={handleChange}
+                        required
+                    &gt;
+                        &lt;option value=&quot;&quot;&gt;-Izberite-&lt;/option&gt;
+                        &lt;option value=&quot;BLAGO&quot;&gt;Blago&lt;/option&gt;
+                        &lt;option value=&quot;STORITVE&quot;&gt;Storitev&lt;/option&gt;
+                    &lt;/select&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Vrsta naročila&lt;/label&gt;
+                    &lt;select
+                        className=&quot;form-select&quot;
+                        name=&quot;orderType&quot;
+                        value={formData.orderType}
+                        onChange={handleChange}
+                        required
+                    &gt;
+                        &lt;option value=&quot;&quot;&gt;-Izberite-&lt;/option&gt;
+                        &lt;option value=&quot;MATERIAL&quot;&gt;MATERIAL&lt;/option&gt;
+                        &lt;option value=&quot;ŽIVILA&quot;&gt;ŽIVILA&lt;/option&gt;
+                        &lt;option value=&quot;ENERGIJA (elektrika, voda, gorivo, plin)&quot;&gt;ENERGIJA (elektrika, voda, gorivo, plin)&lt;/option&gt;
+                        &lt;option value=&quot;MATERIAL ZA VZDRŽEVANJE&quot;&gt;MATERIAL ZA VZDRŽEVANJE&lt;/option&gt;
+                        &lt;option value=&quot;STORITVE&quot;&gt;STORITVE&lt;/option&gt;
+                    &lt;/select&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Datum vnosa&lt;/label&gt;
+                    &lt;input
+                        type=&quot;date&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;entryDate&quot;
+                        value={formData.entryDate}
+                        onChange={handleChange}
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Številka predračuna&lt;/label&gt;
+                    &lt;input
+                        type=&quot;text&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;invoiceNumber&quot;
+                        value={formData.invoiceNumber}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Številka izbire&lt;/label&gt;
+                    &lt;input
+                        type=&quot;text&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;selectNumber&quot;
+                        value={formData.selectNumber}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Količina&lt;/label&gt;
+                    &lt;input
+                        type=&quot;number&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;quantity&quot;
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;M.E.&lt;/label&gt;
+                    &lt;input
+                        type=&quot;text&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;me&quot;
+                        value={formData.me}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Cena brez DDV&lt;/label&gt;
+                    &lt;input
+                        type=&quot;number&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;priceWithoutTax&quot;
+                        value={formData.priceWithoutTax}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Opis naročila&lt;/label&gt;
+                    &lt;textarea
+                        className=&quot;form-control&quot;
+                        name=&quot;itemDescription&quot;
+                        value={formData.itemDescription}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Naročilo&lt;/label&gt;
+                    &lt;input
+                        type=&quot;text&quot;
+                        className=&quot;form-control&quot;
+                        name=&quot;item&quot;
+                        value={formData.item}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Opombe&lt;/label&gt;
+                    &lt;textarea
+                        className=&quot;form-control&quot;
+                        name=&quot;remarks&quot;
+                        value={formData.remarks}
+                        onChange={handleChange}
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;form-check mb-3&quot;&gt;
+                    &lt;input
+                        type=&quot;checkbox&quot;
+                        className=&quot;form-check-input&quot;
+                        name=&quot;acceptConditions&quot;
+                        checked={formData.acceptConditions}
+                        onChange={handleChange}
+                        required
+                    /&gt;
+                    &lt;label className=&quot;form-check-label&quot;&gt;Potrjujem pogoje&lt;/label&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;mb-3&quot;&gt;
+                    &lt;label className=&quot;form-label&quot;&gt;Izberite merila za naročilo:&lt;/label&gt;
+                    &lt;div className=&quot;form-check&quot;&gt;
+                        &lt;input
+                        type=&quot;radio&quot;
+                        id=&quot;criteria1&quot;
+                        name=&quot;selectionCriteria&quot;
+                        value=&quot;Ekonomsko najugodnejša ponudba: Cena&quot;
+                        onChange={handleRadioChange}
+                        checked={formData.selectionCriteria === &quot;Ekonomsko najugodnejša ponudba: Cena&quot;}
+                        className=&quot;form-check-input&quot;
+                        /&gt;
+                        &lt;label htmlFor=&quot;criteria1&quot; className=&quot;form-check-label&quot;&gt;Ekonomsko najugodnejša ponudba: Cena&lt;/label&gt;
+                    &lt;/div&gt;
+
+                    &lt;div className=&quot;form-check&quot;&gt;
+                        &lt;input
+                        type=&quot;radio&quot;
+                        id=&quot;criteria2&quot;
+                        name=&quot;selectionCriteria&quot;
+                        value=&quot;Ekonomsko najugodnejša ponudba - ostalo (opredeljeno v Navodilih)&quot;
+                        onChange={handleRadioChange}
+                        checked={formData.selectionCriteria === &quot;Ekonomsko najugodnejša ponudba - ostalo (opredeljeno v Navodilih)&quot;}
+                        className=&quot;form-check-input&quot;
+                        /&gt;
+                        &lt;label htmlFor=&quot;criteria2&quot; className=&quot;form-check-label&quot;&gt;
+                        Ekonomsko najugodnejša ponudba - ostalo (opredeljeno v Navodilih)
+                        &lt;/label&gt;
+                    &lt;/div&gt;
+
+                    &lt;div className=&quot;form-check&quot;&gt;
+                        &lt;input
+                        type=&quot;radio&quot;
+                        id=&quot;criteria3&quot;
+                        name=&quot;selectionCriteria&quot;
+                        value=&quot;Ustreznost predmeta naročila glede vsebine, programa, lokacije, termina&quot;
+                        onChange={handleRadioChange}
+                        checked={formData.selectionCriteria === &quot;Ustreznost predmeta naročila glede vsebine, programa, lokacije, termina&quot;}
+                        className=&quot;form-check-input&quot;
+                        /&gt;
+                        &lt;label htmlFor=&quot;criteria3&quot; className=&quot;form-check-label&quot;&gt;
+                        Ustreznost predmeta naročila glede vsebine, programa, lokacije, termina
+                        &lt;/label&gt;
+                    &lt;/div&gt;
+
+                    &lt;div className=&quot;form-check&quot;&gt;
+                        &lt;input
+                        type=&quot;radio&quot;
+                        id=&quot;criteria4&quot;
+                        name=&quot;selectionCriteria&quot;
+                        value=&quot;Naročilo lahko izpolni le določen ponudnik&quot;
+                        onChange={handleRadioChange}
+                        checked={formData.selectionCriteria === &quot;Naročilo lahko izpolni le določen ponudnik&quot;}
+                        className=&quot;form-check-input&quot;
+                        /&gt;
+                        &lt;label htmlFor=&quot;criteria4&quot; className=&quot;form-check-label&quot;&gt;
+                        Naročilo lahko izpolni le določen ponudnik iz naslednjih razlogov:
+                        &lt;/label&gt;
+                        &lt;ul style={{ listStyleType: &#039;none&#039;, paddingLeft: &#039;1&#039; }}&gt;
+                        &lt;li&gt;
+                            &lt;input
+                            type=&quot;checkbox&quot;
+                            id=&quot;reason1&quot;
+                            onChange={handleCheckboxChange}
+                            className=&quot;form-check-input&quot;
+                            /&gt;
+                                unikatno umetniško delo ali umetniško uprizoritev
+                        &lt;/li&gt;
+                        &lt;li&gt;
+                            &lt;input
+                            type=&quot;checkbox&quot;
+                            id=&quot;reason2&quot;
+                            onChange={handleCheckboxChange}
+                            className=&quot;form-check-input&quot;
+                            /&gt;
+                                ne obstaja konkurenca za predmet naročila
+                        &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/div&gt;
+
+                    &lt;div className=&quot;form-check&quot;&gt;
+                        &lt;input
+                        type=&quot;radio&quot;
+                        id=&quot;criteria5&quot;
+                        name=&quot;selectionCriteria&quot;
+                        value=&quot;Prevlada načela učinkovitosti&quot;
+                        onChange={handleRadioChange}
+                        checked={formData.selectionCriteria === &quot;Prevlada načela učinkovitosti&quot;}
+                        className=&quot;form-check-input&quot;
+                        /&gt;
+                        &lt;label htmlFor=&quot;criteria5&quot; className=&quot;form-check-label&quot;&gt;
+                        Prevlada načela učinkovitosti v primerih ...
+                        &lt;/label&gt;
+                    &lt;/div&gt;
+
+                    &lt;div className=&quot;form-check&quot;&gt;
+                        &lt;input
+                        type=&quot;radio&quot;
+                        id=&quot;criteria6&quot;
+                        name=&quot;selectionCriteria&quot;
+                        value=&quot;Druga merila&quot;
+                        onChange={handleRadioChange}
+                        checked={formData.selectionCriteria === &quot;Druga merila&quot;}
+                        className=&quot;form-check-input&quot;
+                        /&gt;
+                        &lt;label htmlFor=&quot;criteria6&quot; className=&quot;form-check-label&quot;&gt;
+                        Druga merila
+                        &lt;/label&gt;
+                        {formData.selectionCriteria === &#039;Druga merila&#039; &amp;&amp; (
+                        &lt;textarea
+                            id=&quot;drugo&quot;
+                            className=&quot;form-control border-primary&quot;
+                            placeholder=&quot;Drugo&quot;
+                            value={formData.otherCriteria}
+                            onChange={handleTextareaChange}
+                        /&gt;
+                        )}
+                    &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;button type=&quot;submit&quot; className=&quot;btn btn-primary&quot;&gt;Vnesi za tekoče leto&lt;/button&gt;
+            &lt;/form&gt;
+        &lt;/div&gt;
+    );
+};
+
+export default OrderForm;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

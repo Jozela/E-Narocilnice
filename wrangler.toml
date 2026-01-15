@@ -1,0 +1,5 @@
+name = "e-narcilnice2"
+type = "javascript"
+compatibility_date = "2025-03-09"
+assets = {directory = "client/build"}
+
