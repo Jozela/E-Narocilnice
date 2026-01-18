@@ -5,7 +5,7 @@
   "proxy": "https://e-narcilnice2.joze-lavric-002.workers.dev",
   "dependencies": {
     "axios": "^1.8.2",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.8",
     "browserify-zlib": "^0.2.0",
     "cors": "^2.8.5",
     "cra-template": "1.2.0",
